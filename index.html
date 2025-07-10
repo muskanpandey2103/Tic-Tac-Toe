@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Madhav vs Parth -  Tic-Tac-Toe</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #ffe6f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #ff69b4;
+      margin-bottom: 10px;
+      animation: pop 1s ease-in-out;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: #fff0f5;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+      box-shadow: 2px 2px 10px #ffc0cb;
+    }
+
+    .cell:hover {
+      transform: scale(1.1);
+      background: #ffe0eb;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #ff1493;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      background: #ffb6c1;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 2px 2px 6px #ff69b4;
+    }
+
+    button:hover {
+      background: #ff69b4;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    .win {
+      animation: pop 0.5s ease-in-out infinite alternate;
+    }
+  </style>
+</head>
+<body>
+  <h1>❤️ Madhav vs Parth 💙</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Madhav's turn (❤️)</div>
+  <button onclick="resetGame()">🔁 Restart Game</button>
+
+  
+  <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
+  <audio id="drawSound" src="https://www.soundjay.com/button/sounds/button-4.mp3"></audio>
+
+  <script>
+    const board = document.getElementById('board');
+    const statusText = document.getElementById('status');
+    const clickSound = document.getElementById('clickSound');
+    const winSound = document.getElementById('winSound');
+    const drawSound = document.getElementById('drawSound');
+
+    let cells = [];
+    let currentPlayer = '❤️'; 
+    let gameActive = true;
+
+    const players = {
+      '❤️': 'Madhav',
+      '💙': 'Parth'
+    };
+
+    const winningCombos = [
+      [0,1,2],
+      [3,4,5],
+      [6,7,8],
+      [0,3,6],
+      [1,4,7],
+      [2,5,8],
+      [0,4,8],
+      [2,4,6]
+    ];
+
+    function createBoard() {
+      board.innerHTML = '';
+      cells = [];
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleClick, { once: true });
+        board.appendChild(cell);
+        cells.push(cell);
+      }
+    }
+
+    function handleClick(e) {
+      if (!gameActive) return;
+
+      const cell = e.target;
+      const index = cell.dataset.index;
+
+      cell.textContent = currentPlayer;
+      cell.classList.add('pop');
+      clickSound.play();
+
+      if (checkWin(currentPlayer)) {
+        statusText.textContent = `${players[currentPlayer]} wins! 🎉`;
+        winSound.play();
+        highlightWinningCells(currentPlayer);
+        gameActive = false;
+        return;
+      }
+
+      if (isDraw()) {
+        statusText.textContent = "It's a draw! 😲";
+        drawSound.play();
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === '❤️' ? '💙' : '❤️';
+      statusText.textContent = `${players[currentPlayer]}'s turn (${currentPlayer})`;
+    }
+
+    function checkWin(player) {
+      return winningCombos.some(combo => {
+        return combo.every(index => cells[index].textContent === player);
+      });
+    }
+
+    function highlightWinningCells(player) {
+      winningCombos.forEach(combo => {
+        if (combo.every(index => cells[index].textContent === player)) {
+          combo.forEach(index => {
+            cells[index].classList.add('win');
+          });
+        }
+      });
+    }
+
+    function isDraw() {
+      return cells.every(cell => cell.textContent !== '');
+    }
+
+    function resetGame() {
+      currentPlayer = '❤️';
+      gameActive = true;
+      statusText.textContent = "Madhav's turn (❤️)";
+      createBoard();
+    }
+
+
+    createBoard();
+  </script>
+</body>
+</html>
+
+
